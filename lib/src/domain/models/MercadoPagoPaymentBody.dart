@@ -1,7 +1,11 @@
+// To parse this JSON data, do
+//
+//     final mercadoPagoPaymentBody = mercadoPagoPaymentBodyFromJson(jsonString);
+
 import 'dart:convert';
 
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoCardTokenBody.dart';
-import 'package:ecommerce_v2/src/domain/models/Product.dart';
+import 'package:ecommerce_v2/src/domain/models/Order.dart';
 
 MercadoPagoPaymentBody mercadoPagoPaymentBodyFromJson(String str) =>
     MercadoPagoPaymentBody.fromJson(json.decode(str));
@@ -16,7 +20,7 @@ class MercadoPagoPaymentBody {
   String issuerId;
   String paymentMethodId;
   Payer payer;
-  OrderBody order;
+  Order order;
 
   MercadoPagoPaymentBody({
     required this.transactionAmount,
@@ -36,7 +40,7 @@ class MercadoPagoPaymentBody {
         issuerId: json["issuer_id"],
         paymentMethodId: json["payment_method_id"],
         payer: Payer.fromJson(json["payer"]),
-        order: OrderBody.fromJson(json["order"]),
+        order: Order.fromJson(json["order"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -47,31 +51,6 @@ class MercadoPagoPaymentBody {
         "payment_method_id": paymentMethodId,
         "payer": payer.toJson(),
         "order": order.toJson(),
-      };
-}
-
-class OrderBody {
-  int idClient;
-  int idAddress;
-  List<Product> products;
-
-  OrderBody({
-    required this.idClient,
-    required this.idAddress,
-    required this.products,
-  });
-
-  factory OrderBody.fromJson(Map<String, dynamic> json) => OrderBody(
-        idClient: json["id_client"],
-        idAddress: json["id_address"],
-        products: List<Product>.from(
-            json["products"].map((x) => Product.fromJson(x))),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id_client": idClient,
-        "id_address": idAddress,
-        "products": List<dynamic>.from(products.map((x) => x.toJson())),
       };
 }
 

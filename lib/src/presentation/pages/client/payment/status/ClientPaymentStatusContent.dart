@@ -1,9 +1,9 @@
-import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse.dart';
+import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse2.dart';
 import 'package:ecommerce_v2/src/presentation/widgest/DefaultButton.dart';
 import 'package:flutter/material.dart';
 
 class ClientPaymentStatusContent extends StatelessWidget {
-  MercadoPagoPaymentResponse? paymentResponse;
+  MercadoPagoPaymentResponse2? paymentResponse;
 
   ClientPaymentStatusContent(this.paymentResponse);
 
@@ -71,7 +71,7 @@ class ClientPaymentStatusContent extends StatelessWidget {
   Widget _textStatus() {
     return paymentResponse?.status == 'approved'
         ? Text(
-            'Tu orden fue procesado exitosamente usando (${paymentResponse?.paymentMethodId} **** ${paymentResponse?.card.lastFourDigits})',
+            'Tu orden fue procesado exitosamente usando (${paymentResponse?.payment_method_id})',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,

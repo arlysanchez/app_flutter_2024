@@ -1,6 +1,6 @@
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoCardTokenResponse.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoInstallments.dart';
-import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse.dart';
+import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse2.dart';
 import 'package:ecommerce_v2/src/domain/utils/Resource.dart';
 import 'package:ecommerce_v2/src/presentation/pages/client/payment/installments/ClientPaymentInstallmentsContent.dart';
 import 'package:ecommerce_v2/src/presentation/pages/client/payment/installments/bloc/ClientPaymentInstallmentsBloc.dart';
@@ -52,8 +52,9 @@ class _ClientPaymentInstallmentsPageState
         listener: (context, state) {
           final responsePayment = state.responsePayment;
           if (responsePayment is Success) {
-            MercadoPagoPaymentResponse mercadoPagoPaymentResponse =
-                responsePayment.data as MercadoPagoPaymentResponse;
+            MercadoPagoPaymentResponse2 mercadoPagoPaymentResponse =
+                responsePayment.data as MercadoPagoPaymentResponse2;
+            print('response payment:${mercadoPagoPaymentResponse.toJson()}');
             Navigator.pushNamedAndRemoveUntil(
                 context, 'client/payment/status', (route) => false,
                 arguments: mercadoPagoPaymentResponse);

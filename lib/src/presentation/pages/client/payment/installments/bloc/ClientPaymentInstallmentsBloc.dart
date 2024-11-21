@@ -2,6 +2,7 @@ import 'package:ecommerce_v2/src/domain/models/Address.dart';
 import 'package:ecommerce_v2/src/domain/models/AuthResponse.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoCardTokenBody.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentBody.dart';
+import 'package:ecommerce_v2/src/domain/models/Order.dart';
 import 'package:ecommerce_v2/src/domain/models/Product.dart';
 import 'package:ecommerce_v2/src/domain/useCase/Auth/AuthUseCases.dart';
 import 'package:ecommerce_v2/src/domain/useCase/MercadoPago/MercadoPagoUseCases.dart';
@@ -49,6 +50,16 @@ class ClientPaymentInstallmentsBloc extends Bloc<ClientPaymentInstallmentsEvent,
     Address address = await addressUseCases.getAddressSession.run();
     List<Product> products = await shoppingBagUseCases.getProducts.run();
 
+    // Convertir los productos para que `price` sea de tipo int
+    List<Product> sanitizedProducts = products.map((product) {
+      // Sanitize y convertir price a int
+      final productJson = product.toJson();
+      productJson["price"] =
+          productJson["price"].toInt(); // Convertir `price` a int
+      // Convertir de nuevo el Map a un objeto Product
+      return Product.fromJson(productJson);
+    }).toList();
+
     MercadoPagoPaymentBody body = MercadoPagoPaymentBody(
         transactionAmount: totalToPay.toInt(),
         token: event.mercadoPagoCardTokenResponse.id,
@@ -62,10 +73,10 @@ class ClientPaymentInstallmentsBloc extends Bloc<ClientPaymentInstallmentsEvent,
                     .identification.number,
                 type: event.mercadoPagoCardTokenResponse.cardholder
                     .identification.type)),
-        order: OrderBody(
+        order: Order(
             idClient: authResponse.user.id!,
             idAddress: address.id!,
-            products: products));
+            products: sanitizedProducts));
     Resource responsePayment =
         await mercadoPagoUseCases.createPaymentUseCase.run(body);
     emit(state.copyWith(responsePayment: responsePayment));

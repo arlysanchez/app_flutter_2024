@@ -6,10 +6,11 @@ import 'package:ecommerce_v2/src/domain/models/MercadoPagoCardTokenResponse.dart
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoIdentificationType.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoInstallments.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentBody.dart';
-import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse.dart';
+import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse2.dart';
 import 'package:ecommerce_v2/src/domain/utils/ListToString.dart';
 import 'package:ecommerce_v2/src/domain/utils/Resource.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class MercadoPagoService {
   Future<String> token;
@@ -66,28 +67,43 @@ class MercadoPagoService {
     }
   }
 
-  Future<Resource<MercadoPagoPaymentResponse>> createPayment(
+  Future<Resource<MercadoPagoPaymentResponse2>> createPayment(
       MercadoPagoPaymentBody mercadoPagoPaymentBody) async {
     try {
       Uri url = Uri.http(ApiConfig.API_ECOMMECE, '/mercadopago/payments');
+      final uuid = Uuid();
       Map<String, String> headers = {
         "Content-Type": "application/json",
-        "Authorization": await token
+        "Authorization": await token,
+        'X-Idempotency-Key': uuid.v4()
       };
-      String body = json.encode(mercadoPagoPaymentBody.toJson());
-      final response = await http.post(url, headers: headers, body: body);
+
+      String body = json.encode(mercadoPagoPaymentBody);
+
+      final response = await http
+          .post(url, headers: headers, body: body)
+          .timeout(Duration(seconds: 120));
+      print('Respuesta completa del servidor: ${response.body}');
+      print('Longitud de la respuesta: ${response.body.length}');
+
+      // Decodificar la respuesta JSON
       final data = json.decode(response.body);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        MercadoPagoPaymentResponse mercadoPagoPaymentResponse =
-            MercadoPagoPaymentResponse.fromJson(data);
-        return Success(mercadoPagoPaymentResponse);
+        print('ENTRO AL IF');
+        final mercadoPagoPaymentResponse2 =
+            MercadoPagoPaymentResponse2.fromJson(data);
+        print('SUCCESS${mercadoPagoPaymentResponse2}');
+        return Success(mercadoPagoPaymentResponse2);
       } else {
-        // ERROR
-        return Error(ListToString(data['message']));
+        // Manejar error estructurado
+        final errorMessage = data['message'] ?? 'Error desconocido';
+        print('Error desde el servidor: $errorMessage');
+        return Error(errorMessage);
       }
     } catch (e) {
-      print('Error: $e');
-      return Error(e.toString());
+      print('Error al procesar la solicitud: $e');
+      return Error('Error al procesar el pago: $e');
     }
   }
 
@@ -101,7 +117,9 @@ class MercadoPagoService {
         "Authorization": await token
       };
       final response = await http.get(url, headers: headers);
+
       final data = json.decode(response.body);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         MercadoPagoInstallments mercadoPagoInstallments =
             MercadoPagoInstallments.fromJson(data);

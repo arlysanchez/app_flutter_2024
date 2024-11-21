@@ -3,7 +3,7 @@ import 'package:ecommerce_v2/src/domain/models/MercadoPagoCardTokenResponse.dart
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoIdentificationType.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoInstallments.dart';
 import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentBody.dart';
-import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse.dart';
+import 'package:ecommerce_v2/src/domain/models/MercadoPagoPaymentResponse2.dart';
 import 'package:ecommerce_v2/src/domain/utils/Resource.dart';
 
 abstract class MercadoPagoRepository {
@@ -13,6 +13,6 @@ abstract class MercadoPagoRepository {
       MercadoPagoCardTokenBody mercadoPagoCardTokenBody);
   Future<Resource<MercadoPagoInstallments>> getInstallments(
       String firstSixDigits, String amount);
-  Future<Resource<MercadoPagoPaymentResponse>> createPayment(
+  Future<Resource<MercadoPagoPaymentResponse2>> createPayment(
       MercadoPagoPaymentBody mercadoPagoPaymentBody);
 }
